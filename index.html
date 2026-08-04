@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codex Machina | Ty Runyan</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700;900&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Libre Franklin', sans-serif; }
+    .mono { font-family: 'Space Mono', monospace; }
+    .fade-in { opacity:0; transform:translateY(24px); transition:all 0.6s ease; }
+    .fade-in.visible { opacity:1; transform:translateY(0); }
+    .project-card .proj-overlay { opacity:0; transition:opacity 0.3s ease; }
+    .project-card:hover .proj-overlay, .project-card:focus .proj-overlay { opacity:1; }
+    .skill-bar { height:6px; border-radius:3px; background:#1a1a2e; overflow:hidden; }
+    .skill-bar-fill { height:100%; border-radius:3px; transition:width 1s ease; width:0; }
+    .skill-bar-fill.animate { width: var(--w); }
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:#0a0a0f; }
+    ::-webkit-scrollbar-thumb { background:#222; border-radius:3px; }
+
+    /* Terminal animation */
+    .terminal-window { background:#0d0d14; border:1px solid #1a1a2e; border-radius:8px; overflow:hidden; }
+    .terminal-header { background:#141420; padding:8px 12px; display:flex; gap:6px; align-items:center; }
+    .terminal-dot { width:10px; height:10px; border-radius:50%; }
+    .terminal-body { padding:16px; min-height:280px; font-family:'Space Mono',monospace; font-size:13px; line-height:1.8; color:#00FF88; overflow:hidden; }
+    .terminal-line { opacity:0; transform:translateX(-8px); animation:lineIn 0.3s forwards; }
+    @keyframes lineIn { to { opacity:1; transform:translateX(0); } }
+    .terminal-cursor { display:inline-block; width:8px; height:16px; background:#00FF88; animation:blink 1s infinite; vertical-align:middle; margin-left:2px; }
+    @keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+    .float-anim { animation: float 4s ease-in-out infinite; }
+
+    /* Scanline effect on terminal */
+    .scanlines::after {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,136,0.015) 2px,rgba(0,255,136,0.015) 4px);
+    }
+
+    /* Journal card */
+    .journal-card { border-left:3px solid #00FF88; background:#0d0d14; }
+  </style>
+ </head>
+ <body data-template-id="__page-root" class="w-full min-h-screen text-gray-300" style="background: rgb(10, 10, 15);"><!-- Nav -->
+  <nav class="fixed top-0 w-full z-50 border-b border-white/5 backdrop-blur-md bg-[#0a0a0f]/80">
+   <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center"><span data-template-id="nav-logo" class="canva-text mono text-lg font-bold" style="color: rgb(0, 255, 136); font-weight: 700; font-style: normal; font-size: 16px;">CODEX_MACHINA</span>
+    <div class="hidden md:flex gap-8 text-sm"><a href="#about" class="hover:text-[#00FF88] transition-colors">About</a> <a href="#canon" class="hover:text-[#00FF88] transition-colors">Canon</a> <a href="#journal" class="hover:text-[#00FF88] transition-colors">Journal</a> <a href="#projects" class="hover:text-[#00FF88] transition-colors">Projects</a> <a href="#skills" class="hover:text-[#00FF88] transition-colors">Skills</a> <a href="#contact" class="hover:text-[#00FF88] transition-colors">Contact</a>
+    </div><button id="mobile-menu-btn" class="md:hidden" aria-label="Open menu"><i data-lucide="menu" style="width:24px;height:24px;"></i></button>
+   </div>
+   <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 flex flex-col gap-3 text-sm"><a href="#about" class="hover:text-[#00FF88]">About</a> <a href="#canon" class="hover:text-[#00FF88]">Canon</a> <a href="#journal" class="hover:text-[#00FF88]">Journal</a> <a href="#projects" class="hover:text-[#00FF88]">Projects</a> <a href="#skills" class="hover:text-[#00FF88]">Skills</a> <a href="#contact" class="hover:text-[#00FF88]">Contact</a>
+   </div>
+  </nav><!-- Hero with animated terminal -->
+  <header class="pt-24 px-6" style="min-height:calc(90 * min(var(--vh,1vh),1vh));">
+   <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center h-full" style="min-height:calc(70 * min(var(--vh,1vh),1vh));">
+    <div class="flex flex-col justify-center">
+     <p data-template-id="hero-prefix" class="canva-text mono text-sm mb-3" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">$ whoami</p>
+     <h1 data-template-id="hero-name" class="canva-text text-5xl md:text-7xl font-black mb-5 leading-tight" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 32px;">Ty Runyan</h1>
+     <p data-template-id="hero-tagline" class="canva-text mono text-base md:text-lg mb-10 max-w-lg leading-relaxed" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Cybersecurity Analyst | SIEM • IR • Threat Detection • Linux • Python</p>
+     <div class="flex flex-wrap gap-4"><a href="#projects" data-template-id="hero-cta-projects" class="canva-button px-6 py-3 rounded-sm font-medium transition-all hover:scale-105 inline-block" style="background: rgb(0, 255, 136); color: rgb(10, 10, 15); font-weight: 600; font-style: normal; font-size: 16px;">View Projects</a> <a href="#contact" data-template-id="hero-cta-contact" class="canva-button px-6 py-3 rounded-sm font-medium border border-current transition-all hover:scale-105 inline-block" style="background: transparent; color: rgb(0, 255, 136); font-weight: 500; font-style: normal; font-size: 16px;">Contact Me</a>
+     </div>
+    </div><!-- Animated Terminal -->
+    <div class="relative float-anim">
+     <div class="terminal-window scanlines relative">
+      <div class="terminal-header">
+       <div class="terminal-dot" style="background:#ff5f56;"></div>
+       <div class="terminal-dot" style="background:#ffbd2e;"></div>
+       <div class="terminal-dot" style="background:#27c93f;"></div><span class="mono text-xs text-gray-500 ml-3">soc-analyst@codex:~</span>
+      </div>
+      <div class="terminal-body" id="terminal-output"></div>
+     </div>
+    </div>
+   </div>
+  </header><!-- About -->
+  <section id="about" class="py-24 px-6">
+   <div class="max-w-7xl mx-auto fade-in">
+    <div class="border-l-4 border-[#00FF88] pl-8 max-w-3xl">
+     <h2 data-template-id="about-heading" class="canva-text text-3xl font-bold mb-6" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">About</h2>
+     <p data-template-id="about-bio" class="canva-text leading-relaxed mb-5" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">I'm a cybersecurity professional transitioning from 10 years of operations leadership into SOC analysis. My background in managing complex workflows, leading teams under pressure, and maintaining operational discipline translates directly into incident response, threat triage, and cross-team coordination.</p>
+     <p data-template-id="about-bio-2" class="canva-text leading-relaxed mb-8" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">I build hands-on labs, document findings rigorously, and approach every alert with an investigator's mindset. My goal: defend networks with the same precision I brought to leading operations.</p>
+     <h3 data-template-id="about-certs-heading" class="canva-text font-bold mb-3" style="color: rgb(0, 174, 239); font-weight: 700; font-style: normal; font-size: 19px;">Certifications</h3>
+     <ul class="space-y-2 mb-8">
+      <li data-template-id="cert-1" class="canva-text mono text-sm flex items-center gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Google Cybersecurity Professional Certificate</li>
+      <li data-template-id="cert-2" class="canva-text mono text-sm flex items-center gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Merit America — IT Support &amp; Cybersecurity</li>
+      <li data-template-id="cert-3" class="canva-text mono text-sm flex items-center gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">TryHackMe — SOC Level 1 (In Progress)</li>
+     </ul>
+     <h3 data-template-id="about-tools-heading" class="canva-text font-bold mb-3" style="color: rgb(0, 174, 239); font-weight: 700; font-style: normal; font-size: 19px;">Tools &amp; Technologies</h3>
+     <div class="flex flex-wrap gap-2"><span data-template-id="tool-1" class="canva-tag mono text-xs px-3 py-1 rounded-sm border border-[#00FF8833] bg-[#00FF880D]" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">Wazuh</span> <span data-template-id="tool-2" class="canva-tag mono text-xs px-3 py-1 rounded-sm border border-[#00FF8833] bg-[#00FF880D]" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">Splunk</span> <span data-template-id="tool-3" class="canva-tag mono text-xs px-3 py-1 rounded-sm border border-[#00FF8833] bg-[#00FF880D]" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">Wireshark</span> <span data-template-id="tool-4" class="canva-tag mono text-xs px-3 py-1 rounded-sm border border-[#00FF8833] bg-[#00FF880D]" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">Linux</span> <span data-template-id="tool-5" class="canva-tag mono text-xs px-3 py-1 rounded-sm border border-[#00FF8833] bg-[#00FF880D]" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">Python</span> <span data-template-id="tool-6" class="canva-tag mono text-xs px-3 py-1 rounded-sm border border-[#00FF8833] bg-[#00FF880D]" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">SQL</span> <span data-template-id="tool-7" class="canva-tag mono text-xs px-3 py-1 rounded-sm border border-[#00FF8833] bg-[#00FF880D]" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">Nmap</span> <span data-template-id="tool-8" class="canva-tag mono text-xs px-3 py-1 rounded-sm border border-[#00FF8833] bg-[#00FF880D]" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">Burp Suite</span>
+     </div>
+    </div>
+   </div>
+  </section><!-- Canon -->
+  <section id="canon" class="py-24 px-6 border-t border-white/5">
+   <div class="max-w-7xl mx-auto fade-in">
+    <div class="grid lg:grid-cols-[1.15fr_.85fr] gap-12 items-start">
+     <div>
+      <p data-template-id="canon-kicker" class="canva-text mono text-sm mb-3" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">REFERENCE MANUAL · EDITION 1.0</p>
+      <h2 data-template-id="canon-heading" class="canva-text text-3xl font-bold mb-5" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Codex Machina Canon</h2>
+      <p data-template-id="canon-intro" class="canva-text leading-relaxed mb-8" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">A field reference for the analyst's journey — from terminal fluency and SQL queries to detection engineering, threat intelligence, incident response, and Python automation. Built as a study companion for the Google Cybersecurity Certificate.</p>
+      <div class="grid sm:grid-cols-2 gap-3">
+       <div data-template-id="canon-linux" class="canva-card rounded border border-white/10 p-4" style="background: rgb(16, 16, 24);">
+        <h3 data-template-id="canon-linux-title" class="canva-text font-bold mb-2" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Linux &amp; SQL Foundations</h3>
+        <p data-template-id="canon-linux-desc" class="canva-text text-sm leading-relaxed" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Command mastery, permissions, processes, networking, file systems, queries, filtering, and joins.</p>
+       </div>
+       <div data-template-id="canon-detection" class="canva-card rounded border border-white/10 p-4" style="background: rgb(16, 16, 24);">
+        <h3 data-template-id="canon-detection-title" class="canva-text font-bold mb-2" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Detection &amp; Monitoring</h3>
+        <p data-template-id="canon-detection-desc" class="canva-text text-sm leading-relaxed" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">SIEM, SOAR, log analysis, detection engineering, threat hunting, and exfiltration indicators.</p>
+       </div>
+       <div data-template-id="canon-teams" class="canva-card rounded border border-white/10 p-4" style="background: rgb(16, 16, 24);">
+        <h3 data-template-id="canon-teams-title" class="canva-text font-bold mb-2" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Red, Blue &amp; Purple Teams</h3>
+        <p data-template-id="canon-teams-desc" class="canva-text text-sm leading-relaxed" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Adversary mindset, vulnerability assessment, ATT&amp;CK-based testing, and collaborative validation.</p>
+       </div>
+       <div data-template-id="canon-response" class="canva-card rounded border border-white/10 p-4" style="background: rgb(16, 16, 24);">
+        <h3 data-template-id="canon-response-title" class="canva-text font-bold mb-2" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Incident Response</h3>
+        <p data-template-id="canon-response-desc" class="canva-text text-sm leading-relaxed" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Triage, chain of custody, ticket writing, NIST lifecycle, playbooks, and lessons learned.</p>
+       </div>
+      </div>
+     </div>
+     <aside data-template-id="canon-aside" class="canva-panel rounded-lg border border-[#00FF8833] bg-[#00FF8808] p-6" style="background: rgb(13, 23, 21);">
+      <h3 data-template-id="canon-aside-title" class="canva-text font-bold mb-4" style="color: rgb(0, 174, 239); font-weight: 700; font-style: normal; font-size: 19px;">Quick-reference layers</h3>
+      <ul class="space-y-3">
+       <li data-template-id="canon-resource-1" class="canva-text mono text-sm flex gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Linux ↔ Windows / PowerShell equivalents</li>
+       <li data-template-id="canon-resource-2" class="canva-text mono text-sm flex gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">MITRE ATT&amp;CK technique-to-detection map</li>
+       <li data-template-id="canon-resource-3" class="canva-text mono text-sm flex gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">SIEM / Wazuh / Splunk investigation queries</li>
+       <li data-template-id="canon-resource-4" class="canva-text mono text-sm flex gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Glossary, cheat sheets, ports, and key resources</li>
+      </ul>
+     </aside>
+    </div>
+   </div>
+  </section><!-- Incident Handler's Journal -->
+  <section id="journal" class="py-24 px-6 border-t border-white/5">
+   <div class="max-w-7xl mx-auto fade-in">
+    <h2 data-template-id="journal-heading" class="canva-text text-3xl font-bold mb-3" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Incident Handler's Journal</h2>
+    <p data-template-id="journal-subtitle" class="canva-text text-gray-400 mb-10" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Documenting real-world incident analysis following NIST 800-61 methodology.</p>
+    <div class="journal-card rounded-lg p-6 md:p-8 max-w-4xl">
+     <div class="flex flex-wrap items-center gap-4 mb-5"><span data-template-id="journal-date" class="canva-tag mono text-xs px-3 py-1 rounded-sm border border-[#00FF8833] bg-[#00FF880D]" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">July 23, 2024</span> <span data-template-id="journal-entry-num" class="canva-tag mono text-xs px-3 py-1 rounded-sm border border-[#00AEEF33] bg-[#00AEEF0D]" style="color: rgb(0, 174, 239); font-weight: 400; font-style: normal; font-size: 16px;">Entry #1</span>
+     </div>
+     <h3 data-template-id="journal-title" class="canva-text font-bold text-xl mb-4" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Ransomware Incident — Healthcare Company</h3>
+     <div class="mb-5">
+      <h4 data-template-id="journal-5w-heading" class="canva-text font-bold text-sm uppercase tracking-wider mb-3" style="color: rgb(0, 174, 239); font-weight: 700; font-style: normal; font-size: 16px;">The 5 W's</h4>
+      <ul class="space-y-2">
+       <li data-template-id="journal-who" class="canva-text text-sm flex gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">An organized group of unethical hackers</li>
+       <li data-template-id="journal-what" class="canva-text text-sm flex gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">A ransomware security incident encrypting critical files</li>
+       <li data-template-id="journal-where" class="canva-text text-sm flex gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">At a health care company</li>
+       <li data-template-id="journal-when" class="canva-text text-sm flex gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Tuesday 9:00 a.m.</li>
+       <li data-template-id="journal-why" class="canva-text text-sm flex gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Attackers gained access via phishing, launched ransomware, and demanded ransom for the decryption key. Motivation appears financial.</li>
+      </ul>
+     </div>
+     <div>
+      <h4 data-template-id="journal-notes-heading" class="canva-text font-bold text-sm uppercase tracking-wider mb-3" style="color: rgb(0, 174, 239); font-weight: 700; font-style: normal; font-size: 16px;">Additional Notes</h4>
+      <p data-template-id="journal-notes" class="canva-text text-sm leading-relaxed italic" style="color: rgb(153, 153, 153); font-weight: 400; font-style: normal; font-size: 16px;">How could the health care company prevent an incident like this from occurring again? Should the company pay the ransom to retrieve the decryption key?</p>
+     </div>
+    </div>
+   </div>
+  </section><!-- Projects -->
+  <section id="projects" class="py-24 px-6 border-t border-white/5">
+   <div class="max-w-7xl mx-auto">
+    <h2 data-template-id="projects-heading" class="canva-text text-3xl font-bold mb-3 fade-in" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Projects &amp; Case Studies</h2>
+    <p data-template-id="projects-subtitle" class="canva-text text-gray-400 mb-12 fade-in" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Hover or tap any card to reveal details.</p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+     <div class="project-card relative rounded overflow-hidden aspect-[4/3] fade-in group" tabindex="0"><img data-template-id="proj-siem-img" class="canva-image w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/5380603/pexels-photo-5380603.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Dark room setup with code displayed on PC monitors highlighting cybersecurity themes.">
+      <div class="proj-overlay absolute inset-0 bg-[#0a0a0f]/90 p-5 flex flex-col justify-end">
+       <h3 data-template-id="proj-siem-title" class="canva-text font-bold mb-1" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">SIEM Analysis: SSH Brute-Force Detection</h3>
+       <p data-template-id="proj-siem-tools" class="canva-text mono text-xs mb-3" style="color: rgb(0, 174, 239); font-weight: 400; font-style: normal; font-size: 16px;">Wazuh · Linux VM · Log Parsing</p>
+       <p data-template-id="proj-siem-desc" class="canva-text text-sm leading-relaxed line-clamp-4" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Deployed Wazuh SIEM on a Linux VM to ingest authentication logs. Configured custom rules to detect SSH brute-force patterns, analyzed alert frequency, and documented attacker IPs, geolocations, and timing patterns.</p>
+      </div>
+     </div>
+     <div class="project-card relative rounded overflow-hidden aspect-[4/3] fade-in group" tabindex="0"><img data-template-id="proj-ir-img" class="canva-image w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/30692441/pexels-photo-30692441.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Security officer seated in a dimly lit control room, analyzing multiple surveillance screens.">
+      <div class="proj-overlay absolute inset-0 bg-[#0a0a0f]/90 p-5 flex flex-col justify-end">
+       <h3 data-template-id="proj-ir-title" class="canva-text font-bold mb-1" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Incident Response: Simulated Triage Journal</h3>
+       <p data-template-id="proj-ir-tools" class="canva-text mono text-xs mb-3" style="color: rgb(0, 174, 239); font-weight: 400; font-style: normal; font-size: 16px;">IR Playbook · NIST Framework · Documentation</p>
+       <p data-template-id="proj-ir-desc" class="canva-text text-sm leading-relaxed line-clamp-4" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Created a simulated incident response journal following NIST 800-61 phases. Documented detection, analysis, containment, and recovery for a phishing scenario including IOCs and timeline reconstruction.</p>
+      </div>
+     </div>
+     <div class="project-card relative rounded overflow-hidden aspect-[4/3] fade-in group" tabindex="0"><img data-template-id="proj-net-img" class="canva-image w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/17489155/pexels-photo-17489155.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="A complex network of cables in a data center with a monitor in the foreground.">
+      <div class="proj-overlay absolute inset-0 bg-[#0a0a0f]/90 p-5 flex flex-col justify-end">
+       <h3 data-template-id="proj-net-title" class="canva-text font-bold mb-1" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Network Security: Packet Capture Analysis</h3>
+       <p data-template-id="proj-net-tools" class="canva-text mono text-xs mb-3" style="color: rgb(0, 174, 239); font-weight: 400; font-style: normal; font-size: 16px;">Wireshark · tcpdump · Protocol Analysis</p>
+       <p data-template-id="proj-net-desc" class="canva-text text-sm leading-relaxed line-clamp-4" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Captured and analyzed network traffic using Wireshark to identify anomalous DNS queries, unencrypted credential transmission, and suspicious port scanning activity.</p>
+      </div>
+     </div>
+     <div class="project-card relative rounded overflow-hidden aspect-[4/3] fade-in group" tabindex="0"><img data-template-id="proj-vuln-img" class="canva-image w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/5380618/pexels-photo-5380618.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Close-up view of a computer displaying cybersecurity and data protection interfaces in green tones.">
+      <div class="proj-overlay absolute inset-0 bg-[#0a0a0f]/90 p-5 flex flex-col justify-end">
+       <h3 data-template-id="proj-vuln-title" class="canva-text font-bold mb-1" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Vulnerability Assessment: Network Scanning</h3>
+       <p data-template-id="proj-vuln-tools" class="canva-text mono text-xs mb-3" style="color: rgb(0, 174, 239); font-weight: 400; font-style: normal; font-size: 16px;">Nmap · CVE Research · Risk Scoring</p>
+       <p data-template-id="proj-vuln-desc" class="canva-text text-sm leading-relaxed line-clamp-4" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Conducted Nmap scans against lab targets to enumerate open ports and services. Researched associated CVEs, assessed CVSS scores, and produced a prioritized remediation report.</p>
+      </div>
+     </div>
+     <div class="project-card relative rounded overflow-hidden aspect-[4/3] fade-in group" tabindex="0"><img data-template-id="proj-linux-img" class="canva-image w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/37878823/pexels-photo-37878823.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Close-up of a retro computer screen displaying MS-DOS commands with a vibrant keyboard.">
+      <div class="proj-overlay absolute inset-0 bg-[#0a0a0f]/90 p-5 flex flex-col justify-end">
+       <h3 data-template-id="proj-linux-title" class="canva-text font-bold mb-1" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Linux Security: System Hardening</h3>
+       <p data-template-id="proj-linux-tools" class="canva-text mono text-xs mb-3" style="color: rgb(0, 174, 239); font-weight: 400; font-style: normal; font-size: 16px;">Linux · Bash · Permissions · Audit Logs</p>
+       <p data-template-id="proj-linux-desc" class="canva-text text-sm leading-relaxed line-clamp-4" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Hardened a Linux server by configuring firewall rules, disabling unused services, enforcing file permissions, and implementing audit logging.</p>
+      </div>
+     </div>
+     <div class="project-card relative rounded overflow-hidden aspect-[4/3] fade-in group" tabindex="0"><img data-template-id="proj-python-img" class="canva-image w-full h-full object-cover" loading="lazy" src="https://images.pexels.com/photos/6424584/pexels-photo-6424584.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Programming code on a computer screen in a dark room, showcasing technology and IT expertise.">
+      <div class="proj-overlay absolute inset-0 bg-[#0a0a0f]/90 p-5 flex flex-col justify-end">
+       <h3 data-template-id="proj-python-title" class="canva-text font-bold mb-1" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Python Security Scripts: Log Automation</h3>
+       <p data-template-id="proj-python-tools" class="canva-text mono text-xs mb-3" style="color: rgb(0, 174, 239); font-weight: 400; font-style: normal; font-size: 16px;">Python · Regex · Automation · Log Parsing</p>
+       <p data-template-id="proj-python-desc" class="canva-text text-sm leading-relaxed line-clamp-4" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Built Python scripts to parse authentication logs, extract failed login attempts using regex, and generate summary reports. Automated repetitive SOC tasks.</p>
+      </div>
+     </div>
+    </div>
+   </div>
+  </section><!-- Skills -->
+  <section id="skills" class="py-24 px-6 border-t border-white/5">
+   <div class="max-w-7xl mx-auto fade-in">
+    <h2 data-template-id="skills-heading" class="canva-text text-3xl font-bold mb-12" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Skills Matrix</h2>
+    <div class="grid md:grid-cols-2 gap-12">
+     <div>
+      <h3 data-template-id="skills-cat-1" class="canva-text font-bold text-sm uppercase tracking-wider mb-5" style="color: rgb(0, 174, 239); font-weight: 700; font-style: normal; font-size: 19px;">Security Skills</h3>
+      <div class="space-y-4">
+       <div>
+        <span data-template-id="skill-1a" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Threat Detection &amp; Triage</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00FF88]" style="--w:90%"></div>
+        </div>
+       </div>
+       <div>
+        <span data-template-id="skill-1b" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Incident Response Workflow</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00FF88]" style="--w:85%"></div>
+        </div>
+       </div>
+       <div>
+        <span data-template-id="skill-1c" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Vulnerability Analysis</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00FF88]" style="--w:80%"></div>
+        </div>
+       </div>
+       <div>
+        <span data-template-id="skill-1d" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Log Analysis &amp; Correlation</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00FF88]" style="--w:85%"></div>
+        </div>
+       </div>
+      </div>
+      <h3 data-template-id="skills-cat-2" class="canva-text font-bold text-sm uppercase tracking-wider mb-5 mt-10" style="color: rgb(0, 174, 239); font-weight: 700; font-style: normal; font-size: 19px;">Tools &amp; Platforms</h3>
+      <div class="space-y-4">
+       <div>
+        <span data-template-id="skill-2a" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Wazuh / Splunk SIEM</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00AEEF]" style="--w:85%"></div>
+        </div>
+       </div>
+       <div>
+        <span data-template-id="skill-2b" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Wireshark / tcpdump</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00AEEF]" style="--w:80%"></div>
+        </div>
+       </div>
+       <div>
+        <span data-template-id="skill-2c" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Nmap / Burp Suite</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00AEEF]" style="--w:75%"></div>
+        </div>
+       </div>
+       <div>
+        <span data-template-id="skill-2d" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">OSINT Tools</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00AEEF]" style="--w:70%"></div>
+        </div>
+       </div>
+      </div>
+     </div>
+     <div>
+      <h3 data-template-id="skills-cat-3" class="canva-text font-bold text-sm uppercase tracking-wider mb-5" style="color: rgb(0, 174, 239); font-weight: 700; font-style: normal; font-size: 19px;">Languages</h3>
+      <div class="space-y-4">
+       <div>
+        <span data-template-id="skill-3a" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Python</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00FF88]" style="--w:85%"></div>
+        </div>
+       </div>
+       <div>
+        <span data-template-id="skill-3b" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">SQL</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00FF88]" style="--w:70%"></div>
+        </div>
+       </div>
+       <div>
+        <span data-template-id="skill-3c" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Bash / Shell</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00FF88]" style="--w:80%"></div>
+        </div>
+       </div>
+       <div>
+        <span data-template-id="skill-3d" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Linux CLI</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00FF88]" style="--w:75%"></div>
+        </div>
+       </div>
+      </div>
+      <h3 data-template-id="skills-cat-4" class="canva-text font-bold text-sm uppercase tracking-wider mb-5 mt-10" style="color: rgb(0, 174, 239); font-weight: 700; font-style: normal; font-size: 19px;">Soft Skills</h3>
+      <div class="space-y-4">
+       <div>
+        <span data-template-id="skill-4a" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Operations Leadership</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00AEEF]" style="--w:95%"></div>
+        </div>
+       </div>
+       <div>
+        <span data-template-id="skill-4b" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Technical Documentation</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00AEEF]" style="--w:90%"></div>
+        </div>
+       </div>
+       <div>
+        <span data-template-id="skill-4c" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Cross-Team Coordination</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00AEEF]" style="--w:85%"></div>
+        </div>
+       </div>
+       <div>
+        <span data-template-id="skill-4d" class="canva-text text-sm" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Clear Communication</span>
+        <div class="skill-bar mt-1">
+         <div class="skill-bar-fill bg-[#00AEEF]" style="--w:90%"></div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </section><!-- Contact -->
+  <section id="contact" class="py-24 px-6 border-t border-white/5">
+   <div class="max-w-7xl mx-auto fade-in">
+    <div class="grid md:grid-cols-2 gap-16">
+     <div>
+      <h2 data-template-id="resume-heading" class="canva-text text-3xl font-bold mb-4" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Resume</h2>
+      <p data-template-id="resume-desc" class="canva-text text-gray-400 mb-6" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Download my resume for a complete overview of experience, projects, and certifications.</p><a data-template-id="resume-cta" class="canva-button inline-flex items-center gap-2 px-6 py-3 rounded-sm font-medium hover:scale-105 transition-transform" href="#" target="_blank" rel="noopener noreferrer" style="background: rgb(0, 255, 136); color: rgb(10, 10, 15); font-weight: 700; font-style: normal; font-size: 16px;">Download Resume (PDF)</a>
+     </div>
+     <div>
+      <h2 data-template-id="contact-heading" class="canva-text text-3xl font-bold mb-4" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Get in Touch</h2>
+      <p data-template-id="contact-desc" class="canva-text text-gray-400 mb-6" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Open to SOC Analyst, Security Analyst, and Cybersecurity roles. Let's connect.</p>
+      <div class="flex flex-col gap-3"><a data-template-id="contact-email" class="canva-link mono text-sm flex items-center gap-2 hover:text-[#00FF88] transition-colors" href="mailto:ty@example.com" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">ty@example.com</a> <a data-template-id="contact-linkedin" class="canva-link mono text-sm flex items-center gap-2 hover:text-[#00FF88] transition-colors" href="#" target="_blank" rel="noopener noreferrer" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">LinkedIn</a> <a data-template-id="contact-github" class="canva-link mono text-sm flex items-center gap-2 hover:text-[#00FF88] transition-colors" href="#" target="_blank" rel="noopener noreferrer" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">GitHub</a>
+      </div>
+     </div>
+    </div>
+   </div>
+  </section>
+  <footer class="border-t border-white/5 py-8 px-6 text-center">
+   <p data-template-id="footer-text" class="canva-text mono text-xs" style="color: rgb(85, 85, 85); font-weight: 400; font-style: normal; font-size: 16px;">© 2026 Ty Runyan — Codex Machina. Built with discipline.</p>
+  </footer>
+  <script>
+    lucide.createIcons();
+
+    // Mobile menu
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
+    // Fade-in observer
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+    // Skill bars
+    const barObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.querySelectorAll('.skill-bar-fill').forEach(b => b.classList.add('animate'));
+        }
+      });
+    }, { threshold: 0.2 });
+    document.querySelectorAll('#skills').forEach(el => barObs.observe(el));
+
+    // Terminal typing animation
+    (function() {
+      const lines = [
+        { text: '$ tail -f /var/log/auth.log', color: '#00FF88' },
+        { text: 'Jul 23 09:01:14 sshd[2847]: Failed password for root from 203.0.113.45', color: '#ff6b6b' },
+        { text: 'Jul 23 09:01:16 sshd[2847]: Failed password for root from 203.0.113.45', color: '#ff6b6b' },
+        { text: '[WAZUH] Rule 5712 fired — SSH brute-force detected', color: '#ffbd2e' },
+        { text: '$ grep -c "Failed password" /var/log/auth.log', color: '#00FF88' },
+        { text: '2,847', color: '#00AEEF' },
+        { text: '$ python3 parse_auth.py --output report.csv', color: '#00FF88' },
+        { text: '[✓] 47 unique IPs flagged. Report generated.', color: '#27c93f' },
+        { text: '$ nmap -sV -O 10.0.0.0/24', color: '#00FF88' },
+        { text: 'Discovered 12 hosts — 3 critical CVEs identified', color: '#ffbd2e' },
+      ];
+
+      const terminal = document.getElementById('terminal-output');
+      let lineIndex = 0;
+
+      function typeLine() {
+        if (terminal.children.length > 7) {
+          terminal.removeChild(terminal.firstChild);
+        }
+        const line = lines[lineIndex % lines.length];
+        const div = document.createElement('div');
+        div.className = 'terminal-line';
+        div.style.color = line.color;
+        div.style.animationDelay = '0s';
+        terminal.appendChild(div);
+
+        let charIndex = 0;
+        const speed = 30 + Math.random() * 20;
+        function typeChar() {
+          if (charIndex < line.text.length) {
+            div.textContent = line.text.substring(0, charIndex + 1);
+            charIndex++;
+            setTimeout(typeChar, speed);
+          } else {
+            lineIndex++;
+            setTimeout(typeLine, 1200);
+          }
+        }
+        typeChar();
+      }
+
+      // Add initial cursor then start
+      setTimeout(typeLine, 800);
+    })();
+  </script>
+ 
+</body></html>
