@@ -8,7 +8,40 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700;900&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Libre Franklin', sans-serif; }
+    :root {
+      --bg: #08090d;
+      --panel: rgba(16, 16, 24, 0.82);
+      --panel-strong: #0d0d14;
+      --text: #f5f7fa;
+      --muted: #b6bec9;
+      --accent: #00ff88;
+      --accent-2: #00aeef;
+      --line: rgba(255,255,255,0.08);
+    }
+
+    body {
+      font-family: 'Libre Franklin', sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(0,255,136,0.08), transparent 24%),
+        radial-gradient(circle at top right, rgba(0,174,239,0.10), transparent 30%),
+        linear-gradient(135deg, #07080b 0%, #0a0a10 52%, #040407 100%);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 30px 30px;
+      mask-image: radial-gradient(circle at center, black, transparent 85%);
+      opacity: 0.45;
+    }
+
     .mono { font-family: 'Space Mono', monospace; }
     .fade-in { opacity:0; transform:translateY(24px); transition:all 0.6s ease; }
     .fade-in.visible { opacity:1; transform:translateY(0); }
@@ -21,11 +54,57 @@
     ::-webkit-scrollbar-track { background:#0a0a0f; }
     ::-webkit-scrollbar-thumb { background:#222; border-radius:3px; }
 
-    /* Terminal animation */
-    .terminal-window { background:#0d0d14; border:1px solid #1a1a2e; border-radius:8px; overflow:hidden; }
+    .hero-panel {
+      background: linear-gradient(180deg, rgba(13,13,20,0.9), rgba(10,10,15,0.94));
+      border: 1px solid rgba(0,255,136,0.18);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    }
+
+    .glass-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .metric-card {
+      border: 1px solid rgba(0,255,136,0.18);
+      background: linear-gradient(180deg, rgba(12,19,17,0.82), rgba(8,9,13,0.96));
+      box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+    }
+
+    .hero-stat {
+      border: 1px solid rgba(0,255,136,0.2);
+      background: rgba(0,255,136,0.07);
+    }
+
+    .pulse-ring {
+      position: absolute;
+      inset: -14px;
+      border: 1px solid rgba(0,255,136,0.34);
+      border-radius: 999px;
+      animation: pulse 3.8s infinite;
+    }
+
+    .brief-strip {
+      background: linear-gradient(90deg, rgba(0,255,136,0.10), rgba(0,174,239,0.06));
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.96); opacity: 0.75; }
+      70% { transform: scale(1.06); opacity: 0; }
+      100% { transform: scale(1.06); opacity: 0; }
+    }
+
+    .section-kicker {
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .terminal-window { background:#0d0d14; border:1px solid rgba(0,255,136,0.18); border-radius:12px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,0.45); }
     .terminal-header { background:#141420; padding:8px 12px; display:flex; gap:6px; align-items:center; }
     .terminal-dot { width:10px; height:10px; border-radius:50%; }
-    .terminal-body { padding:16px; min-height:280px; font-family:'Space Mono',monospace; font-size:13px; line-height:1.8; color:#00FF88; overflow:hidden; }
+    .terminal-body { padding:16px; min-height:320px; font-family:'Space Mono',monospace; font-size:13px; line-height:1.8; color:#00FF88; overflow:hidden; }
     .terminal-line { opacity:0; transform:translateX(-8px); animation:lineIn 0.3s forwards; }
     @keyframes lineIn { to { opacity:1; transform:translateX(0); } }
     .terminal-cursor { display:inline-block; width:8px; height:16px; background:#00FF88; animation:blink 1s infinite; vertical-align:middle; margin-left:2px; }
@@ -33,13 +112,11 @@
     @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
     .float-anim { animation: float 4s ease-in-out infinite; }
 
-    /* Scanline effect on terminal */
     .scanlines::after {
       content:''; position:absolute; inset:0; pointer-events:none;
       background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,136,0.015) 2px,rgba(0,255,136,0.015) 4px);
     }
 
-    /* Journal card */
     .journal-card { border-left:3px solid #00FF88; background:#0d0d14; }
   </style>
  </head>
@@ -52,33 +129,92 @@
    <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 flex flex-col gap-3 text-sm"><a href="#about" class="hover:text-[#00FF88]">About</a> <a href="#canon" class="hover:text-[#00FF88]">Canon</a> <a href="#journal" class="hover:text-[#00FF88]">Journal</a> <a href="#projects" class="hover:text-[#00FF88]">Projects</a> <a href="#skills" class="hover:text-[#00FF88]">Skills</a> <a href="#contact" class="hover:text-[#00FF88]">Contact</a>
    </div>
   </nav><!-- Hero with animated terminal -->
-  <header class="pt-24 px-6" style="min-height:calc(90 * min(var(--vh,1vh),1vh));">
-   <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center h-full" style="min-height:calc(70 * min(var(--vh,1vh),1vh));">
+  <header class="pt-24 px-6 pb-12" style="min-height:calc(90 * min(var(--vh,1vh),1vh));">
+   <div class="max-w-7xl mx-auto grid md:grid-cols-[1.05fr_.95fr] gap-8 items-center h-full" style="min-height:calc(70 * min(var(--vh,1vh),1vh));">
     <div class="flex flex-col justify-center">
-     <p data-template-id="hero-prefix" class="canva-text mono text-sm mb-3" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">$ whoami</p>
-     <h1 data-template-id="hero-name" class="canva-text text-5xl md:text-7xl font-black mb-5 leading-tight" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 32px;">Ty Runyan</h1>
-     <p data-template-id="hero-tagline" class="canva-text mono text-base md:text-lg mb-10 max-w-lg leading-relaxed" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Cybersecurity Analyst | SIEM • IR • Threat Detection • Linux • Python</p>
-     <div class="flex flex-wrap gap-4"><a href="#projects" data-template-id="hero-cta-projects" class="canva-button px-6 py-3 rounded-sm font-medium transition-all hover:scale-105 inline-block" style="background: rgb(0, 255, 136); color: rgb(10, 10, 15); font-weight: 600; font-style: normal; font-size: 16px;">View Projects</a> <a href="#contact" data-template-id="hero-cta-contact" class="canva-button px-6 py-3 rounded-sm font-medium border border-current transition-all hover:scale-105 inline-block" style="background: transparent; color: rgb(0, 255, 136); font-weight: 500; font-style: normal; font-size: 16px;">Contact Me</a>
+     <p data-template-id="hero-prefix" class="canva-text mono text-sm mb-4 section-kicker" style="color: rgb(0, 255, 136); font-weight: 400; font-style: normal; font-size: 16px;">PROJECT / PORTFOLIO / RECRUITING VIEW</p>
+     <h1 data-template-id="hero-name" class="canva-text text-5xl md:text-7xl font-black mb-4 leading-[0.95]" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 48px;">Codex Machina</h1>
+     <h2 data-template-id="hero-tagline" class="canva-text text-2xl md:text-4xl font-bold mb-4 leading-tight" style="color: rgb(0, 255, 136); font-weight: 700; font-style: normal; font-size: 26px;">Cybersecurity Portfolio / IR Playbook / Living Lab</h2>
+     <p class="canva-text text-base md:text-lg mb-8 max-w-2xl leading-relaxed" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 18px;">A recruiter-facing portfolio that functions as both a personal brand and a security project: threat detection, incident response documentation, Linux operations, Python automation, and a story-driven security narrative built to stand out.</p>
+     <div class="grid sm:grid-cols-3 gap-3 mb-8 max-w-3xl">
+      <div class="metric-card rounded p-4">
+       <div class="mono text-xs mb-2" style="color:#00FF88">01</div>
+       <div class="font-bold text-lg mb-1">Security Narrative</div>
+       <div class="text-sm text-gray-400">A portfolio designed like a living threat-defense project.</div>
+      </div>
+      <div class="metric-card rounded p-4">
+       <div class="mono text-xs mb-2" style="color:#00FF88">02</div>
+       <div class="font-bold text-lg mb-1">Demonstrated Thinking</div>
+       <div class="text-sm text-gray-400">IR logic, detection discipline, Linux fluency, and case-study style communication.</div>
+      </div>
+      <div class="metric-card rounded p-4">
+       <div class="mono text-xs mb-2" style="color:#00FF88">03</div>
+       <div class="font-bold text-lg mb-1">Recruiter Magnet</div>
+       <div class="text-sm text-gray-400">A concise, memorable site that signals initiative and depth immediately.</div>
+      </div>
+     </div>
+     <div class="flex flex-wrap gap-4"><a href="#projects" data-template-id="hero-cta-projects" class="canva-button px-6 py-3 rounded-sm font-medium transition-all hover:scale-105 inline-block" style="background: rgb(0, 255, 136); color: rgb(10, 10, 15); font-weight: 600; font-style: normal; font-size: 16px;">Explore the Portfolio</a> <a href="#contact" data-template-id="hero-cta-contact" class="canva-button px-6 py-3 rounded-sm font-medium border border-current transition-all hover:scale-105 inline-block" style="background: transparent; color: rgb(0, 255, 136); font-weight: 500; font-style: normal; font-size: 16px;">Start a Conversation</a>
      </div>
     </div><!-- Animated Terminal -->
     <div class="relative float-anim">
-     <div class="terminal-window scanlines relative">
+     <div class="terminal-window scanlines relative hero-panel">
       <div class="terminal-header">
        <div class="terminal-dot" style="background:#ff5f56;"></div>
        <div class="terminal-dot" style="background:#ffbd2e;"></div>
-       <div class="terminal-dot" style="background:#27c93f;"></div><span class="mono text-xs text-gray-500 ml-3">soc-analyst@codex:~</span>
+       <div class="terminal-dot" style="background:#27c93f;"></div><span class="mono text-xs text-gray-500 ml-3">codex-machina://portfolio</span>
       </div>
       <div class="terminal-body" id="terminal-output"></div>
      </div>
     </div>
    </div>
-  </header><!-- About -->
+  </header>
+
+  <section class="py-8 px-6">
+   <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-4">
+    <div class="glass-card rounded-lg p-5 fade-in">
+     <p class="mono text-xs mb-2" style="color:#00FF88">MISSION</p>
+     <h3 class="font-bold text-lg mb-2">Show the operator, not just the résumé.</h3>
+     <p class="text-sm text-gray-400">This is a living personal security project meant to frame your transition into cybersecurity with clarity and confidence.</p>
+    </div>
+    <div class="glass-card rounded-lg p-5 fade-in">
+     <p class="mono text-xs mb-2" style="color:#00FF88">THREAT MODEL</p>
+     <h3 class="font-bold text-lg mb-2">Analyst mindset under pressure.</h3>
+     <p class="text-sm text-gray-400">Every section is intended to signal triage discipline, IR structure, and technical communication that recruiters can quickly understand.</p>
+    </div>
+    <div class="glass-card rounded-lg p-5 fade-in">
+     <p class="mono text-xs mb-2" style="color:#00FF88">DELIVERABLE</p>
+     <h3 class="font-bold text-lg mb-2">A site that earns attention.</h3>
+     <p class="text-sm text-gray-400">The goal is the immediate “what is this?” reaction followed by the deeper “this person is serious about security.”</p>
+    </div>
+   </div>
+  </section>
+
+  <section class="px-6 pb-6">
+   <div class="max-w-7xl mx-auto brief-strip rounded-lg p-6 fade-in">
+    <p class="mono text-xs mb-3" style="color:#00FF88">RECRUITER BRIEF</p>
+    <div class="grid lg:grid-cols-[1.1fr_.9fr] gap-6 items-center">
+     <div>
+      <h3 class="text-2xl font-bold mb-3">Why this site should stop a recruiter in their tracks</h3>
+      <p class="text-gray-300 leading-relaxed">This is not a passive portfolio. It is a concise proof-of-capability artifact that demonstrates technical curiosity, structured thinking, and a clear shift from operations leadership into security analysis.</p>
+     </div>
+     <div class="grid sm:grid-cols-2 gap-3">
+      <div class="metric-card rounded p-4"><div class="mono text-xs mb-2" style="color:#00FF88">VALUE</div><div class="font-semibold">Clear SOC narrative</div></div>
+      <div class="metric-card rounded p-4"><div class="mono text-xs mb-2" style="color:#00FF88">VALUE</div><div class="font-semibold">IR and detection framing</div></div>
+      <div class="metric-card rounded p-4"><div class="mono text-xs mb-2" style="color:#00FF88">VALUE</div><div class="font-semibold">Hands-on technical voice</div></div>
+      <div class="metric-card rounded p-4"><div class="mono text-xs mb-2" style="color:#00FF88">VALUE</div><div class="font-semibold">Memorable personal brand</div></div>
+     </div>
+    </div>
+   </div>
+  </section>
+
+  <!-- About -->
   <section id="about" class="py-24 px-6">
    <div class="max-w-7xl mx-auto fade-in">
     <div class="border-l-4 border-[#00FF88] pl-8 max-w-3xl">
+     <p class="mono text-sm mb-3 section-kicker" style="color: rgb(0,255,136);">Portfolio Narrative</p>
      <h2 data-template-id="about-heading" class="canva-text text-3xl font-bold mb-6" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">About</h2>
-     <p data-template-id="about-bio" class="canva-text leading-relaxed mb-5" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">I'm a cybersecurity professional transitioning from 10 years of operations leadership into SOC analysis. My background in managing complex workflows, leading teams under pressure, and maintaining operational discipline translates directly into incident response, threat triage, and cross-team coordination.</p>
-     <p data-template-id="about-bio-2" class="canva-text leading-relaxed mb-8" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">I build hands-on labs, document findings rigorously, and approach every alert with an investigator's mindset. My goal: defend networks with the same precision I brought to leading operations.</p>
+     <p data-template-id="about-bio" class="canva-text leading-relaxed mb-5" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">I’m a cybersecurity-focused operator with a leadership background in high-pressure environments, now translating that discipline into a security career built around detection, triage, incident response, and documentation.</p>
+     <p data-template-id="about-bio-2" class="canva-text leading-relaxed mb-8" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">This portfolio is more than a résumé. It’s a working security project: a codified operating mindset, a living lab, and a concise proof of how I think under pressure.</p>
      <h3 data-template-id="about-certs-heading" class="canva-text font-bold mb-3" style="color: rgb(0, 174, 239); font-weight: 700; font-style: normal; font-size: 19px;">Certifications</h3>
      <ul class="space-y-2 mb-8">
       <li data-template-id="cert-1" class="canva-text mono text-sm flex items-center gap-2" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Google Cybersecurity Professional Certificate</li>
@@ -327,12 +463,13 @@
    <div class="max-w-7xl mx-auto fade-in">
     <div class="grid md:grid-cols-2 gap-16">
      <div>
+      <p class="mono text-sm mb-3 section-kicker" style="color: rgb(0,255,136);">Action</p>
       <h2 data-template-id="resume-heading" class="canva-text text-3xl font-bold mb-4" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Resume</h2>
-      <p data-template-id="resume-desc" class="canva-text text-gray-400 mb-6" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Download my resume for a complete overview of experience, projects, and certifications.</p><a data-template-id="resume-cta" class="canva-button inline-flex items-center gap-2 px-6 py-3 rounded-sm font-medium hover:scale-105 transition-transform" href="#" target="_blank" rel="noopener noreferrer" style="background: rgb(0, 255, 136); color: rgb(10, 10, 15); font-weight: 700; font-style: normal; font-size: 16px;">Download Resume (PDF)</a>
+      <p data-template-id="resume-desc" class="canva-text text-gray-400 mb-6" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">This page is built to signal seriousness, initiative, and technical presence in one glance. The next step is a direct conversation about security roles.</p><a data-template-id="resume-cta" class="canva-button inline-flex items-center gap-2 px-6 py-3 rounded-sm font-medium hover:scale-105 transition-transform" href="#" target="_blank" rel="noopener noreferrer" style="background: rgb(0, 255, 136); color: rgb(10, 10, 15); font-weight: 700; font-style: normal; font-size: 16px;">Download Resume (PDF)</a>
      </div>
      <div>
       <h2 data-template-id="contact-heading" class="canva-text text-3xl font-bold mb-4" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Get in Touch</h2>
-      <p data-template-id="contact-desc" class="canva-text text-gray-400 mb-6" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Open to SOC Analyst, Security Analyst, and Cybersecurity roles. Let's connect.</p>
+      <p data-template-id="contact-desc" class="canva-text text-gray-400 mb-6" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">Open to SOC Analyst, Security Analyst, and Cybersecurity opportunities where disciplined operations and clear technical communication matter.</p>
       <div class="flex flex-col gap-3"><a data-template-id="contact-email" class="canva-link mono text-sm flex items-center gap-2 hover:text-[#00FF88] transition-colors" href="mailto:ty@example.com" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">ty@example.com</a> <a data-template-id="contact-linkedin" class="canva-link mono text-sm flex items-center gap-2 hover:text-[#00FF88] transition-colors" href="#" target="_blank" rel="noopener noreferrer" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">LinkedIn</a> <a data-template-id="contact-github" class="canva-link mono text-sm flex items-center gap-2 hover:text-[#00FF88] transition-colors" href="#" target="_blank" rel="noopener noreferrer" style="color: rgb(192, 192, 192); font-weight: 400; font-style: normal; font-size: 16px;">GitHub</a>
       </div>
      </div>
